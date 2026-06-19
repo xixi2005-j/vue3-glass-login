@@ -217,6 +217,7 @@ function handleRegister() {
 }
 
 onMounted(() => {
+  usernameInput.value?.focus()
   if (!props.enableAnimation || !cardRef.value) return
   const tl = gsap.timeline()
   tl.fromTo(cardRef.value,
@@ -233,7 +234,6 @@ onMounted(() => {
     { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
     '-=0.15'
   )
-  tl.call(() => usernameInput.value?.focus())
 })
 </script>
 
