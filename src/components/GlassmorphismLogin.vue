@@ -1,6 +1,6 @@
 <template>
   <div class="login-page" :style="bgStyle">
-    <div class="login-card">
+    <div ref="cardRef" class="login-card">
       <div class="card-left" :style="bgStyle">
         <div class="left-content">
           <h2>{{ title }}</h2>
@@ -106,6 +106,7 @@ const emit = defineEmits<{
 
 const isLogin = ref(true)
 const usernameInput = ref<HTMLInputElement>()
+const cardRef = ref<HTMLElement>()
 const form = reactive<LoginForm>({
   username: '',
   password: '',
@@ -120,7 +121,7 @@ const errors = reactive({
 
 const bgStyle = computed(() => {
   if (props.backgroundImage) {
-    return { backgroundImage: `url(${props.backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    return { backgroundImage: `url(${props.backgroundImage})` }
   }
   return {}
 })
@@ -161,22 +162,19 @@ function handleSubmit() {
 onMounted(() => {
   usernameInput.value?.focus()
 
-  if (!props.enableAnimation) return
-
-  const card = document.querySelector('.login-card') as HTMLElement
-  if (!card) return
+  if (!props.enableAnimation || !cardRef.value) return
 
   const tl = gsap.timeline()
-  tl.fromTo(card,
+  tl.fromTo(cardRef.value,
     { y: 20, scale: 0.98 },
     { y: 0, scale: 1, duration: 0.5, ease: 'power2.out' }
   )
-  tl.fromTo('.card-right .input-group',
+  tl.fromTo(cardRef.value.querySelectorAll('.input-group'),
     { opacity: 0, x: 15 },
     { opacity: 1, x: 0, duration: 0.35, stagger: 0.08, ease: 'power2.out' },
     '-=0.2'
   )
-  tl.fromTo('.btn-login',
+  tl.fromTo(cardRef.value.querySelector('.btn-login'),
     { opacity: 0, y: 10 },
     { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
   )
@@ -185,18 +183,27 @@ onMounted(() => {
 
 <style scoped>
 .login-page {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #1a1a2e;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
 }
 
 .login-card {
   display: flex;
   width: 860px;
-  min-height: 500px;
+  max-width: 90vw;
+  height: 500px;
+  max-height: 90vh;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 
@@ -251,13 +258,14 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);
-  padding: 50px 40px;
+  padding: 40px 36px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   will-change: transform;
+  overflow-y: auto;
 }
 
 .card-right::before {
@@ -271,10 +279,10 @@ onMounted(() => {
 }
 
 .card-right h2 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
   color: #fff;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 1px;
@@ -283,7 +291,7 @@ onMounted(() => {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .input-group {
@@ -291,7 +299,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 0;
   position: relative;
-  padding-bottom: 22px;
+  padding-bottom: 20px;
 }
 
 .input-group label {
@@ -304,7 +312,7 @@ onMounted(() => {
 
 .input-group input {
   width: 100%;
-  padding: 14px 18px;
+  padding: 12px 16px;
   border: 1px solid rgba(44, 82, 130, 0.25);
   border-radius: 12px;
   font-size: 14px;
@@ -350,7 +358,7 @@ onMounted(() => {
 
 .btn-login {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: linear-gradient(135deg, #2196F3, #81D4FA);
   color: #fff;
   border: none;
@@ -359,7 +367,7 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 8px;
+  margin-top: 4px;
   letter-spacing: 2px;
   position: relative;
   overflow: hidden;
@@ -387,7 +395,7 @@ onMounted(() => {
   text-align: center;
   font-size: 13px;
   color: rgba(44, 82, 130, 0.6);
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .switch-link a {
@@ -405,18 +413,28 @@ onMounted(() => {
 @media (max-width: 768px) {
   .login-card {
     flex-direction: column;
-    width: 90%;
-    min-height: auto;
+    width: 90vw;
+    height: auto;
+    max-height: 90vh;
   }
 
   .card-left {
     flex: none;
-    min-height: 200px;
+    min-height: 160px;
   }
 
   .card-right {
     flex: none;
-    padding: 30px 20px;
+    padding: 24px 20px;
+  }
+
+  .left-content h2 {
+    font-size: 24px;
+  }
+
+  .card-right h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
   }
 }
 </style>
