@@ -453,14 +453,9 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-.page-enter-active,
+/* 只处理离开动画，进入由GSAP控制 */
 .page-leave-active {
-  transition: transform 0.5s ease, opacity 0.3s ease;
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: scale(0.96) translateY(10px);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .page-leave-to {
@@ -468,9 +463,7 @@ onMounted(() => {
   transform: scale(1.02) translateY(-10px);
 }
 
-.page-enter-to,
-.page-leave-from {
-  opacity: 1;
-  transform: scale(1) translateY(0);
+.page-enter-from {
+  opacity: 0;
 }
 </style>
