@@ -7,7 +7,7 @@
           <p>{{ subtitle }}</p>
         </div>
       </div>
-      <div class="card-right" :class="{ 'register-mode': !isLogin }">
+      <div class="card-right">
         <transition name="page" mode="out-in" @after-enter="onAfterEnter">
           <div v-if="isLogin" key="login">
             <h2>登录</h2>
@@ -45,7 +45,7 @@
           </div>
           <div v-else key="register">
             <h2>注册账号</h2>
-            <form class="login-form register-form" @submit.prevent="handleRegister" novalidate>
+            <form class="login-form" @submit.prevent="handleRegister" novalidate>
               <div class="input-group">
                 <label>用户名</label>
                 <input
@@ -250,7 +250,7 @@ onMounted(() => {
 .login-card {
   display: flex;
   width: 860px;
-  height: 500px;
+  min-height: 500px;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 
@@ -311,10 +311,6 @@ onMounted(() => {
   will-change: transform;
 }
 
-.card-right.register-mode {
-  padding: 40px 36px;
-}
-
 .card-right::before {
   content: '';
   position: absolute;
@@ -341,20 +337,12 @@ onMounted(() => {
   gap: 18px;
 }
 
-.login-form.register-form {
-  gap: 12px;
-}
-
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 0;
   position: relative;
   padding-bottom: 22px;
-}
-
-.register-form .input-group {
-  padding-bottom: 18px;
 }
 
 .input-group label {
