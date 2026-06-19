@@ -155,7 +155,6 @@ function switchToRegister() {
   loginForm.password = ''
   loginErrors.username = false
   loginErrors.password = false
-  nextTick(() => usernameInput.value?.focus())
 }
 
 function switchToLogin() {
@@ -166,10 +165,10 @@ function switchToLogin() {
   registerErrors.username = false
   registerErrors.password = false
   registerErrors.confirmPassword = false
-  nextTick(() => usernameInput.value?.focus())
 }
 
 function onAfterEnter() {
+  usernameInput.value?.focus()
   animateForm()
 }
 
