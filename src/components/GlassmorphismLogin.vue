@@ -1,7 +1,7 @@
 <template>
-  <div class="login-page">
+  <div class="login-page" :style="bgStyle">
     <div class="login-card">
-      <div class="card-left">
+      <div class="card-left" :style="bgStyle">
         <div class="left-content">
           <h2>{{ title }}</h2>
           <p>{{ subtitle }}</p>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import gsap from 'gsap'
 
 interface LoginForm {
@@ -85,8 +85,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   backgroundImage: '',
-  title: 'Welcome Back',
-  subtitle: 'Please sign in to continue',
+  title: '欢迎回来',
+  subtitle: '请登录以继续',
   loginText: '登 录',
   loadingText: '加载中...',
   usernameLabel: '用户名',
@@ -116,6 +116,13 @@ const errors = reactive({
   username: false,
   password: false,
   confirmPassword: false
+})
+
+const bgStyle = computed(() => {
+  if (props.backgroundImage) {
+    return { backgroundImage: `url(${props.backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+  }
+  return {}
 })
 
 function clearError(field: 'username' | 'password' | 'confirmPassword') {
@@ -183,7 +190,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: url('@/assets/background.jpg') center / cover no-repeat;
+  background: #1a1a2e;
 }
 
 .login-card {
@@ -200,7 +207,9 @@ onMounted(() => {
 
 .card-left {
   flex: 1.1;
-  background: url('@/assets/background.jpg') center / cover no-repeat;
+  background: #2c3e50;
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
