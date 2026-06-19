@@ -309,6 +309,7 @@ onMounted(() => {
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   will-change: transform;
+  overflow-y: auto;
 }
 
 .card-right::before {
