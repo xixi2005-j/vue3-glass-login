@@ -250,7 +250,7 @@ onMounted(() => {
 .login-card {
   display: flex;
   width: 860px;
-  min-height: 500px;
+  height: 500px;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 
