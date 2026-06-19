@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
 
 interface LoginForm {
@@ -131,14 +131,34 @@ function clearError(field: 'username' | 'password' | 'confirmPassword') {
 }
 
 function toggleMode() {
-  isLogin.value = !isLogin.value
-  form.username = ''
-  form.password = ''
-  form.confirmPassword = ''
-  errors.username = false
-  errors.password = false
-  errors.confirmPassword = false
-  usernameInput.value?.focus()
+  if (!cardRef.value) return
+
+  const formEl = cardRef.value.querySelector('.login-form')
+  if (!formEl) return
+
+  gsap.to(formEl, {
+    opacity: 0,
+    x: isLogin.value ? -20 : 20,
+    duration: 0.25,
+    ease: 'power2.in',
+    onComplete: () => {
+      isLogin.value = !isLogin.value
+      form.username = ''
+      form.password = ''
+      form.confirmPassword = ''
+      errors.username = false
+      errors.password = false
+      errors.confirmPassword = false
+
+      nextTick(() => {
+        gsap.fromTo(formEl,
+          { opacity: 0, x: isLogin.value ? 20 : -20 },
+          { opacity: 1, x: 0, duration: 0.25, ease: 'power2.out' }
+        )
+        usernameInput.value?.focus()
+      })
+    }
+  })
 }
 
 function handleSubmit() {
