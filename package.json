@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "keywords": ["vue3", "login", "glassmorphism", "ui", "component"],
-  "author": "金曦",
+  "author": "xixi2005-j",
   "license": "MIT",
   "dependencies": {
     "vue": "^3.4.21",
