@@ -1,15 +1,15 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <div class="card-left" :style="{ backgroundImage: `url(${backgroundImage})` }">
+      <div class="card-left">
         <div class="left-content">
           <h2>{{ title }}</h2>
           <p>{{ subtitle }}</p>
         </div>
       </div>
       <div class="card-right">
-        <h2>{{ loginText }}</h2>
-        <form class="login-form" @submit.prevent="handleLogin" novalidate>
+        <h2>{{ isLogin ? loginText : '注册账号' }}</h2>
+        <form class="login-form" @submit.prevent="handleSubmit" novalidate>
           <div class="input-group">
             <label>{{ usernameLabel }}</label>
             <input
@@ -33,11 +33,23 @@
             />
             <span class="error-msg" :class="{ visible: errors.password }">{{ passwordError }}</span>
           </div>
+          <div v-if="!isLogin" class="input-group">
+            <label>确认密码</label>
+            <input
+              v-model="form.confirmPassword"
+              type="password"
+              placeholder="请再次输入密码"
+              :class="{ 'input-error': errors.confirmPassword }"
+              @input="clearError('confirmPassword')"
+            />
+            <span class="error-msg" :class="{ visible: errors.confirmPassword }">两次密码不一致</span>
+          </div>
           <button class="btn-login" type="submit" :disabled="loading">
-            {{ loading ? loadingText : loginText }}
+            {{ loading ? loadingText : (isLogin ? loginText : '注 册') }}
           </button>
-          <div v-if="showRegister" class="register-link">
-            {{ registerHint }}<a href="#" @click.prevent="$emit('register')">{{ registerText }}</a>
+          <div class="switch-link">
+            {{ isLogin ? '还没有账号？' : '已有账号？' }}
+            <a href="#" @click.prevent="toggleMode">{{ isLogin ? '立即注册' : '立即登录' }}</a>
           </div>
         </form>
       </div>
@@ -52,6 +64,7 @@ import gsap from 'gsap'
 interface LoginForm {
   username: string
   password: string
+  confirmPassword?: string
 }
 
 interface Props {
@@ -66,9 +79,6 @@ interface Props {
   passwordLabel?: string
   passwordPlaceholder?: string
   passwordError?: string
-  showRegister?: boolean
-  registerHint?: string
-  registerText?: string
   loading?: boolean
   enableAnimation?: boolean
 }
@@ -78,47 +88,67 @@ const props = withDefaults(defineProps<Props>(), {
   title: 'Welcome Back',
   subtitle: 'Please sign in to continue',
   loginText: '登 录',
-  loadingText: '登录中...',
+  loadingText: '加载中...',
   usernameLabel: '用户名',
   usernamePlaceholder: '请输入用户名',
   usernameError: '请输入用户名',
   passwordLabel: '密码',
   passwordPlaceholder: '请输入密码',
   passwordError: '请输入密码',
-  showRegister: true,
-  registerHint: '还没有账号？',
-  registerText: '立即注册',
   loading: false,
   enableAnimation: true
 })
 
 const emit = defineEmits<{
   (e: 'login', form: LoginForm): void
-  (e: 'register'): void
+  (e: 'register', form: LoginForm): void
 }>()
 
+const isLogin = ref(true)
 const usernameInput = ref<HTMLInputElement>()
 const form = reactive<LoginForm>({
   username: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 })
 
 const errors = reactive({
   username: false,
-  password: false
+  password: false,
+  confirmPassword: false
 })
 
-function clearError(field: 'username' | 'password') {
+function clearError(field: 'username' | 'password' | 'confirmPassword') {
   errors[field] = false
 }
 
-function handleLogin() {
+function toggleMode() {
+  isLogin.value = !isLogin.value
+  form.username = ''
+  form.password = ''
+  form.confirmPassword = ''
+  errors.username = false
+  errors.password = false
+  errors.confirmPassword = false
+  usernameInput.value?.focus()
+}
+
+function handleSubmit() {
   errors.username = !form.username.trim()
   errors.password = !form.password.trim()
 
   if (errors.username || errors.password) return
 
-  emit('login', { ...form })
+  if (!isLogin.value) {
+    errors.confirmPassword = form.password !== form.confirmPassword
+    if (errors.confirmPassword) return
+  }
+
+  if (isLogin.value) {
+    emit('login', { username: form.username, password: form.password })
+  } else {
+    emit('register', { username: form.username, password: form.password })
+  }
 }
 
 onMounted(() => {
@@ -153,7 +183,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #1a1a2e;
+  background: url('@/assets/background.jpg') center / cover no-repeat;
 }
 
 .login-card {
@@ -170,7 +200,7 @@ onMounted(() => {
 
 .card-left {
   flex: 1.1;
-  background: center / cover no-repeat;
+  background: url('@/assets/background.jpg') center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -344,21 +374,21 @@ onMounted(() => {
   box-shadow: none;
 }
 
-.register-link {
+.switch-link {
   text-align: center;
   font-size: 13px;
   color: rgba(44, 82, 130, 0.6);
   margin-top: 8px;
 }
 
-.register-link a {
+.switch-link a {
   color: #2770dd;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
 }
 
-.register-link a:hover {
+.switch-link a:hover {
   color: #45a4db;
   text-decoration: underline;
 }
