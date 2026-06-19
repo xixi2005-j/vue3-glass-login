@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="card-right">
-        <transition name="page" mode="out-in">
+        <transition name="page" mode="out-in" @after-enter="onAfterEnter">
           <div v-if="isLogin" key="login">
             <h2>登录</h2>
             <form class="login-form" @submit.prevent="handleLogin" novalidate>
@@ -155,10 +155,7 @@ function switchToRegister() {
   loginForm.password = ''
   loginErrors.username = false
   loginErrors.password = false
-  nextTick(() => {
-    usernameInput.value?.focus()
-    animateForm()
-  })
+  nextTick(() => usernameInput.value?.focus())
 }
 
 function switchToLogin() {
@@ -169,10 +166,11 @@ function switchToLogin() {
   registerErrors.username = false
   registerErrors.password = false
   registerErrors.confirmPassword = false
-  nextTick(() => {
-    usernameInput.value?.focus()
-    animateForm()
-  })
+  nextTick(() => usernameInput.value?.focus())
+}
+
+function onAfterEnter() {
+  animateForm()
 }
 
 function animateForm() {
