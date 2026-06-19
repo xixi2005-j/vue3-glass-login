@@ -1,182 +1,250 @@
 <template>
-  <div class="login-page" :style="bgStyle">
-    <div ref="cardRef" class="login-card">
-      <div class="card-left" :style="bgStyle">
+  <div class="login-page">
+    <div class="login-card" ref="cardRef">
+      <div class="card-left">
         <div class="left-content">
           <h2>{{ title }}</h2>
           <p>{{ subtitle }}</p>
         </div>
       </div>
       <div class="card-right">
-        <h2>{{ isLogin ? loginText : '注册账号' }}</h2>
-        <form class="login-form" @submit.prevent="handleSubmit" novalidate>
-          <div class="input-group">
-            <label>{{ usernameLabel }}</label>
-            <input
-              ref="usernameInput"
-              v-model="form.username"
-              type="text"
-              :placeholder="usernamePlaceholder"
-              :class="{ 'input-error': errors.username }"
-              @input="clearError('username')"
-            />
-            <span class="error-msg" :class="{ visible: errors.username }">{{ usernameError }}</span>
+        <transition name="page" mode="out-in">
+          <div v-if="isLogin" key="login">
+            <h2>登录</h2>
+            <form class="login-form" @submit.prevent="handleLogin" novalidate>
+              <div class="input-group">
+                <label>用户名</label>
+                <input
+                  ref="usernameInput"
+                  v-model="loginForm.username"
+                  type="text"
+                  placeholder="请输入用户名"
+                  :class="{ 'input-error': loginErrors.username }"
+                  @input="clearLoginError('username')"
+                />
+                <span class="error-msg" :class="{ visible: loginErrors.username }">请输入用户名</span>
+              </div>
+              <div class="input-group">
+                <label>密码</label>
+                <input
+                  v-model="loginForm.password"
+                  type="password"
+                  placeholder="请输入密码"
+                  :class="{ 'input-error': loginErrors.password }"
+                  @input="clearLoginError('password')"
+                />
+                <span class="error-msg" :class="{ visible: loginErrors.password }">请输入密码</span>
+              </div>
+              <button class="btn-login" type="submit" :disabled="loading">
+                {{ loading ? '登录中...' : '登 录' }}
+              </button>
+              <div class="switch-link">
+                还没有账号？<a href="#" @click.prevent="switchToRegister">立即注册</a>
+              </div>
+            </form>
           </div>
-          <div class="input-group">
-            <label>{{ passwordLabel }}</label>
-            <input
-              v-model="form.password"
-              type="password"
-              :placeholder="passwordPlaceholder"
-              :class="{ 'input-error': errors.password }"
-              @input="clearError('password')"
-            />
-            <span class="error-msg" :class="{ visible: errors.password }">{{ passwordError }}</span>
+          <div v-else key="register">
+            <h2>注册账号</h2>
+            <form class="login-form" @submit.prevent="handleRegister" novalidate>
+              <div class="input-group">
+                <label>用户名</label>
+                <input
+                  ref="usernameInput"
+                  v-model="registerForm.username"
+                  type="text"
+                  placeholder="3-50个字符"
+                  :class="{ 'input-error': registerErrors.username }"
+                  @input="clearRegisterError('username')"
+                />
+                <span class="error-msg" :class="{ visible: registerErrors.username }">{{ registerErrorMsgs.username }}</span>
+              </div>
+              <div class="input-group">
+                <label>密码</label>
+                <input
+                  v-model="registerForm.password"
+                  type="password"
+                  placeholder="至少6位"
+                  :class="{ 'input-error': registerErrors.password }"
+                  @input="clearRegisterError('password')"
+                />
+                <span class="error-msg" :class="{ visible: registerErrors.password }">{{ registerErrorMsgs.password }}</span>
+              </div>
+              <div class="input-group">
+                <label>确认密码</label>
+                <input
+                  v-model="registerForm.confirmPassword"
+                  type="password"
+                  placeholder="再次输入密码"
+                  :class="{ 'input-error': registerErrors.confirmPassword }"
+                  @input="clearRegisterError('confirmPassword')"
+                />
+                <span class="error-msg" :class="{ visible: registerErrors.confirmPassword }">{{ registerErrorMsgs.confirmPassword }}</span>
+              </div>
+              <button class="btn-login" type="submit" :disabled="loading">
+                {{ loading ? '注册中...' : '注 册' }}
+              </button>
+              <div class="switch-link">
+                已有账号？<a href="#" @click.prevent="switchToLogin">立即登录</a>
+              </div>
+            </form>
           </div>
-          <div v-if="!isLogin" class="input-group">
-            <label>确认密码</label>
-            <input
-              v-model="form.confirmPassword"
-              type="password"
-              placeholder="请再次输入密码"
-              :class="{ 'input-error': errors.confirmPassword }"
-              @input="clearError('confirmPassword')"
-            />
-            <span class="error-msg" :class="{ visible: errors.confirmPassword }">两次密码不一致</span>
-          </div>
-          <button class="btn-login" type="submit" :disabled="loading">
-            {{ loading ? loadingText : (isLogin ? loginText : '注 册') }}
-          </button>
-          <div class="switch-link">
-            {{ isLogin ? '还没有账号？' : '已有账号？' }}
-            <a href="#" @click.prevent="toggleMode">{{ isLogin ? '立即注册' : '立即登录' }}</a>
-          </div>
-        </form>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
 
 interface LoginForm {
   username: string
   password: string
-  confirmPassword?: string
+}
+
+interface RegisterForm {
+  username: string
+  password: string
+  confirmPassword: string
 }
 
 interface Props {
   backgroundImage?: string
   title?: string
   subtitle?: string
-  loginText?: string
-  loadingText?: string
-  usernameLabel?: string
-  usernamePlaceholder?: string
-  usernameError?: string
-  passwordLabel?: string
-  passwordPlaceholder?: string
-  passwordError?: string
   loading?: boolean
   enableAnimation?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   backgroundImage: '',
-  title: '欢迎回来',
-  subtitle: '请登录以继续',
-  loginText: '登 录',
-  loadingText: '加载中...',
-  usernameLabel: '用户名',
-  usernamePlaceholder: '请输入用户名',
-  usernameError: '请输入用户名',
-  passwordLabel: '密码',
-  passwordPlaceholder: '请输入密码',
-  passwordError: '请输入密码',
+  title: '故障工单系统',
+  subtitle: '网络故障快速响应平台',
   loading: false,
   enableAnimation: true
 })
 
 const emit = defineEmits<{
   (e: 'login', form: LoginForm): void
-  (e: 'register', form: LoginForm): void
+  (e: 'register', form: { username: string; password: string }): void
 }>()
 
 const isLogin = ref(true)
 const usernameInput = ref<HTMLInputElement>()
 const cardRef = ref<HTMLElement>()
-const form = reactive<LoginForm>({
+
+const loginForm = reactive<LoginForm>({
+  username: '',
+  password: ''
+})
+
+const loginErrors = reactive({
+  username: false,
+  password: false
+})
+
+const registerForm = reactive<RegisterForm>({
   username: '',
   password: '',
   confirmPassword: ''
 })
 
-const errors = reactive({
+const registerErrors = reactive({
   username: false,
   password: false,
   confirmPassword: false
 })
 
-const bgStyle = computed(() => {
-  if (props.backgroundImage) {
-    return { backgroundImage: `url(${props.backgroundImage})` }
-  }
-  return {}
+const registerErrorMsgs = reactive({
+  username: '',
+  password: '',
+  confirmPassword: ''
 })
 
-function clearError(field: 'username' | 'password' | 'confirmPassword') {
-  errors[field] = false
+function clearLoginError(field: 'username' | 'password') {
+  loginErrors[field] = false
 }
 
-function toggleMode() {
-  if (!cardRef.value) return
+function clearRegisterError(field: 'username' | 'password' | 'confirmPassword') {
+  registerErrors[field] = false
+  registerErrorMsgs[field] = ''
+}
 
-  const formEl = cardRef.value.querySelector('.login-form')
-  if (!formEl) return
-
-  gsap.to(formEl, {
-    opacity: 0,
-    x: isLogin.value ? -20 : 20,
-    duration: 0.25,
-    ease: 'power2.in',
-    onComplete: () => {
-      isLogin.value = !isLogin.value
-      form.username = ''
-      form.password = ''
-      form.confirmPassword = ''
-      errors.username = false
-      errors.password = false
-      errors.confirmPassword = false
-
-      nextTick(() => {
-        gsap.fromTo(formEl,
-          { opacity: 0, x: isLogin.value ? 20 : -20 },
-          { opacity: 1, x: 0, duration: 0.25, ease: 'power2.out' }
-        )
-        usernameInput.value?.focus()
-      })
-    }
+function switchToRegister() {
+  isLogin.value = false
+  loginForm.username = ''
+  loginForm.password = ''
+  loginErrors.username = false
+  loginErrors.password = false
+  nextTick(() => {
+    usernameInput.value?.focus()
+    animateForm()
   })
 }
 
-function handleSubmit() {
-  errors.username = !form.username.trim()
-  errors.password = !form.password.trim()
+function switchToLogin() {
+  isLogin.value = true
+  registerForm.username = ''
+  registerForm.password = ''
+  registerForm.confirmPassword = ''
+  registerErrors.username = false
+  registerErrors.password = false
+  registerErrors.confirmPassword = false
+  nextTick(() => {
+    usernameInput.value?.focus()
+    animateForm()
+  })
+}
 
-  if (errors.username || errors.password) return
+function animateForm() {
+  if (!cardRef.value) return
 
-  if (!isLogin.value) {
-    errors.confirmPassword = form.password !== form.confirmPassword
-    if (errors.confirmPassword) return
+  const tl = gsap.timeline()
+  tl.fromTo(cardRef.value.querySelectorAll('.input-group'),
+    { opacity: 0, x: 15 },
+    { opacity: 1, x: 0, duration: 0.35, stagger: 0.08, ease: 'power2.out' }
+  )
+  tl.fromTo(cardRef.value.querySelector('.btn-login'),
+    { opacity: 0, y: 10 },
+    { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
+    '-=0.15'
+  )
+}
+
+function handleLogin() {
+  loginErrors.username = !loginForm.username.trim()
+  loginErrors.password = !loginForm.password.trim()
+
+  if (loginErrors.username || loginErrors.password) return
+
+  emit('login', { username: loginForm.username, password: loginForm.password })
+}
+
+function handleRegister() {
+  let hasError = false
+
+  if (!registerForm.username.trim() || registerForm.username.length < 3) {
+    registerErrors.username = true
+    registerErrorMsgs.username = '用户名至少3个字符'
+    hasError = true
   }
 
-  if (isLogin.value) {
-    emit('login', { username: form.username, password: form.password })
-  } else {
-    emit('register', { username: form.username, password: form.password })
+  if (!registerForm.password || registerForm.password.length < 6) {
+    registerErrors.password = true
+    registerErrorMsgs.password = '密码至少6位'
+    hasError = true
   }
+
+  if (registerForm.password !== registerForm.confirmPassword) {
+    registerErrors.confirmPassword = true
+    registerErrorMsgs.confirmPassword = '两次密码不一致'
+    hasError = true
+  }
+
+  if (hasError) return
+
+  emit('register', { username: registerForm.username, password: registerForm.password })
 }
 
 onMounted(() => {
@@ -203,27 +271,17 @@ onMounted(() => {
 
 <style scoped>
 .login-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #1a1a2e;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
 }
 
 .login-card {
   display: flex;
   width: 860px;
-  max-width: 90vw;
-  height: 500px;
-  max-height: 90vh;
+  min-height: 500px;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 
@@ -234,9 +292,7 @@ onMounted(() => {
 
 .card-left {
   flex: 1.1;
-  background: #2c3e50;
-  background-size: cover;
-  background-position: center;
+  background: url('@/assets/background.jpg') center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,14 +334,13 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);
-  padding: 40px 36px;
+  padding: 50px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   will-change: transform;
-  overflow-y: auto;
 }
 
 .card-right::before {
@@ -299,10 +354,10 @@ onMounted(() => {
 }
 
 .card-right h2 {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   color: #fff;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 1px;
@@ -311,7 +366,7 @@ onMounted(() => {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .input-group {
@@ -319,7 +374,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 0;
   position: relative;
-  padding-bottom: 20px;
+  padding-bottom: 22px;
 }
 
 .input-group label {
@@ -332,7 +387,7 @@ onMounted(() => {
 
 .input-group input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border: 1px solid rgba(44, 82, 130, 0.25);
   border-radius: 12px;
   font-size: 14px;
@@ -378,7 +433,7 @@ onMounted(() => {
 
 .btn-login {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: linear-gradient(135deg, #2196F3, #81D4FA);
   color: #fff;
   border: none;
@@ -387,7 +442,7 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 4px;
+  margin-top: 8px;
   letter-spacing: 2px;
   position: relative;
   overflow: hidden;
@@ -415,7 +470,7 @@ onMounted(() => {
   text-align: center;
   font-size: 13px;
   color: rgba(44, 82, 130, 0.6);
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .switch-link a {
@@ -430,31 +485,25 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-  .login-card {
-    flex-direction: column;
-    width: 90vw;
-    height: auto;
-    max-height: 90vh;
-  }
+/* 页面切换动画 - 和原项目一致 */
+.page-enter-active,
+.page-leave-active {
+  transition: transform 0.5s ease, opacity 0.3s ease;
+}
 
-  .card-left {
-    flex: none;
-    min-height: 160px;
-  }
+.page-enter-from {
+  opacity: 0;
+  transform: scale(0.96) translateY(10px);
+}
 
-  .card-right {
-    flex: none;
-    padding: 24px 20px;
-  }
+.page-leave-to {
+  opacity: 0;
+  transform: scale(1.02) translateY(-10px);
+}
 
-  .left-content h2 {
-    font-size: 24px;
-  }
-
-  .card-right h2 {
-    font-size: 22px;
-    margin-bottom: 16px;
-  }
+.page-enter-to,
+.page-leave-from {
+  opacity: 1;
+  transform: scale(1) translateY(0);
 }
 </style>
