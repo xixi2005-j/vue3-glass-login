@@ -127,6 +127,10 @@ import bgImage from './assets/your-image.jpg'
 
 MIT
 
+## 🖼️ 背景图片来源
+
+背景图片来源于 [Unsplash](https://unsplash.com/photos/aerial-photography-of-mountain-range-covered-with-snow-under-white-and-blue-sky-at-daytime-9wg5jCEPBsw)，如有侵权告知删除。图片可以自行切换。
+
 ## 👤 作者
 
 金曦 (Jin Xi)
