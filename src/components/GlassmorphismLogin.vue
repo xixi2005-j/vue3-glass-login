@@ -1,7 +1,7 @@
 <template>
-  <div class="login-page">
+  <div class="login-page" :style="bgStyle">
     <div class="login-card" ref="cardRef">
-      <div class="card-left">
+      <div class="card-left" :style="bgStyle">
         <div class="left-content">
           <h2>{{ title }}</h2>
           <p>{{ subtitle }}</p>
@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
 
 interface LoginForm {
@@ -103,14 +103,8 @@ interface LoginForm {
   password: string
 }
 
-interface RegisterForm {
-  username: string
-  password: string
-  confirmPassword: string
-}
-
 interface Props {
-  backgroundImage?: string
+  backgroundImage: string
   title?: string
   subtitle?: string
   loading?: boolean
@@ -118,7 +112,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  backgroundImage: '',
   title: '故障工单系统',
   subtitle: '网络故障快速响应平台',
   loading: false,
@@ -134,33 +127,18 @@ const isLogin = ref(true)
 const usernameInput = ref<HTMLInputElement>()
 const cardRef = ref<HTMLElement>()
 
-const loginForm = reactive<LoginForm>({
-  username: '',
-  password: ''
-})
+const bgStyle = computed(() => ({
+  backgroundImage: `url(${props.backgroundImage})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center'
+}))
 
-const loginErrors = reactive({
-  username: false,
-  password: false
-})
+const loginForm = reactive<LoginForm>({ username: '', password: '' })
+const loginErrors = reactive({ username: false, password: false })
 
-const registerForm = reactive<RegisterForm>({
-  username: '',
-  password: '',
-  confirmPassword: ''
-})
-
-const registerErrors = reactive({
-  username: false,
-  password: false,
-  confirmPassword: false
-})
-
-const registerErrorMsgs = reactive({
-  username: '',
-  password: '',
-  confirmPassword: ''
-})
+const registerForm = reactive({ username: '', password: '', confirmPassword: '' })
+const registerErrors = reactive({ username: false, password: false, confirmPassword: false })
+const registerErrorMsgs = reactive({ username: '', password: '', confirmPassword: '' })
 
 function clearLoginError(field: 'username' | 'password') {
   loginErrors[field] = false
@@ -199,7 +177,6 @@ function switchToLogin() {
 
 function animateForm() {
   if (!cardRef.value) return
-
   const tl = gsap.timeline()
   tl.fromTo(cardRef.value.querySelectorAll('.input-group'),
     { opacity: 0, x: 15 },
@@ -215,43 +192,34 @@ function animateForm() {
 function handleLogin() {
   loginErrors.username = !loginForm.username.trim()
   loginErrors.password = !loginForm.password.trim()
-
   if (loginErrors.username || loginErrors.password) return
-
   emit('login', { username: loginForm.username, password: loginForm.password })
 }
 
 function handleRegister() {
   let hasError = false
-
   if (!registerForm.username.trim() || registerForm.username.length < 3) {
     registerErrors.username = true
     registerErrorMsgs.username = '用户名至少3个字符'
     hasError = true
   }
-
   if (!registerForm.password || registerForm.password.length < 6) {
     registerErrors.password = true
     registerErrorMsgs.password = '密码至少6位'
     hasError = true
   }
-
   if (registerForm.password !== registerForm.confirmPassword) {
     registerErrors.confirmPassword = true
     registerErrorMsgs.confirmPassword = '两次密码不一致'
     hasError = true
   }
-
   if (hasError) return
-
   emit('register', { username: registerForm.username, password: registerForm.password })
 }
 
 onMounted(() => {
   usernameInput.value?.focus()
-
   if (!props.enableAnimation || !cardRef.value) return
-
   const tl = gsap.timeline()
   tl.fromTo(cardRef.value,
     { y: 20, scale: 0.98 },
@@ -271,11 +239,13 @@ onMounted(() => {
 
 <style scoped>
 .login-page {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
 }
 
 .login-card {
@@ -292,7 +262,6 @@ onMounted(() => {
 
 .card-left {
   flex: 1.1;
-  background: url('@/assets/background.jpg') center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -485,7 +454,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-/* 页面切换动画 - 和原项目一致 */
 .page-enter-active,
 .page-leave-active {
   transition: transform 0.5s ease, opacity 0.3s ease;
