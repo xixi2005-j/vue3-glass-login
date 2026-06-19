@@ -1,6 +1,6 @@
 <template>
   <div class="login-page" :style="bgStyle">
-    <div class="login-card" ref="cardRef">
+    <div class="login-card" :class="{ 'register-card': !isLogin }" ref="cardRef">
       <div class="card-left" :style="bgStyle">
         <div class="left-content">
           <h2>{{ title }}</h2>
@@ -250,13 +250,18 @@ onMounted(() => {
 .login-card {
   display: flex;
   width: 860px;
-  min-height: 500px;
+  height: 500px;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.1);
   will-change: transform;
+}
+
+.login-card.register-card {
+  height: auto;
+  min-height: 500px;
 }
 
 .card-left {
