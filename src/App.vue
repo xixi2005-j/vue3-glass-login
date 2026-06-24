@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GlassmorphismLogin } from './components/GlassmorphismLogin.vue'
+import GlassmorphismLogin from './components/GlassmorphismLogin.vue'
 import bgImage from './assets/background.jpg'
 
 const loading = ref(false)
