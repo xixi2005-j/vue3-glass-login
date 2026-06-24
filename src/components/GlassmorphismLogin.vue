@@ -185,11 +185,6 @@ function animateForm() {
   )
 }
 
-function onAfterEnter() {
-  animateForm()
-  usernameInput.value?.focus()
-}
-
 function handleLogin() {
   loginErrors.username = !loginForm.username.trim()
   loginErrors.password = !loginForm.password.trim()
