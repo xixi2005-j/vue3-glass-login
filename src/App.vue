@@ -1,9 +1,8 @@
 <template>
   <GlassmorphismLogin
-    :background-image="backgroundImage"
-    title="故障工单系统"
-    subtitle="网络故障快速响应平台"
-    login-text="登 录"
+    :background-image="bgImage"
+    title="可修改主标题"
+    subtitle="可修改副标题内容"
     :loading="loading"
     @login="handleLogin"
     @register="handleRegister"
@@ -12,8 +11,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import GlassmorphismLogin from './components/GlassmorphismLogin.vue'
-import backgroundImage from './assets/background.jpg'
+import { GlassmorphismLogin } from './components/GlassmorphismLogin.vue'
+import bgImage from './assets/background.jpg'
 
 const loading = ref(false)
 
@@ -25,7 +24,7 @@ function handleLogin(form: { username: string; password: string }) {
   }, 1500)
 }
 
-function handleRegister() {
-  alert('点击了注册')
+function handleRegister(form: { username: string; password: string }) {
+  alert(`注册成功！\n用户名: ${form.username}`)
 }
 </script>
