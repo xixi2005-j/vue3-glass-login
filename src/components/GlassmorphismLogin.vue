@@ -183,7 +183,11 @@ function animateForm() {
     { opacity: 0, y: 10 },
     { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
   )
-  tl.call(() => usernameInput.value?.focus())
+}
+
+function onAfterEnter() {
+  animateForm()
+  usernameInput.value?.focus()
 }
 
 function handleLogin() {
