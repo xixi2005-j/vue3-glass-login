@@ -1,55 +1,30 @@
 <template>
-  <div id="app">
-    <div class="global-bg"></div>
-    <router-view v-slot="{ Component }">
-      <transition name="page" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view>
-  </div>
+  <GlassmorphismLogin
+    :background-image="bgImage"
+    title="可修改主标题"
+    subtitle="可修改副标题内容"
+    :loading="loading"
+    @login="handleLogin"
+    @register="handleRegister"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import GlassmorphismLogin from './components/GlassmorphismLogin.vue'
+import bgImage from './assets/background.jpg'
+
+const loading = ref(false)
+
+function handleLogin(form: { username: string; password: string }) {
+  loading.value = true
+  setTimeout(() => {
+    alert(`登录成功！\n用户名: ${form.username}`)
+    loading.value = false
+  }, 1500)
+}
+
+function handleRegister(form: { username: string; password: string }) {
+  alert(`注册成功！\n用户名: ${form.username}`)
+}
 </script>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body, #app {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-.global-bg {
-  position: fixed;
-  inset: 0;
-  background: url('@/assets/bj.jpg') center / cover no-repeat;
-  z-index: -1;
-}
-
-.page-enter-active,
-.page-leave-active {
-  transition: transform 0.5s ease, opacity 0.3s ease;
-}
-
-.page-enter-from {
-  opacity: 0;
-  transform: scale(0.96) translateY(10px);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: scale(1.02) translateY(-10px);
-}
-
-.page-enter-to,
-.page-leave-from {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-</style>
