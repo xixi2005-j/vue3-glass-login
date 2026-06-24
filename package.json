@@ -1,19 +1,24 @@
 {
   "name": "vue3-glassmorphism-login",
   "version": "1.0.0",
-  "description": "A beautiful glassmorphism login page component for Vue 3",
+  "description": "A beautiful glassmorphism login page for Vue 3",
   "type": "module",
-  "main": "src/components/GlassmorphismLogin.vue",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
-  "keywords": ["vue3", "login", "glassmorphism", "ui", "component"],
+  "keywords": ["vue3", "login", "glassmorphism", "ui"],
   "author": "xixi2005-j",
+  "license": "MIT",
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "axios": "^1.16.0",
+    "element-plus": "^2.14.0",
+    "gsap": "^3.12.5",
+    "pinia": "^2.1.7",
     "vue": "^3.4.21",
-    "gsap": "^3.12.5"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
