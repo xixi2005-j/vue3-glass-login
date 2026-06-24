@@ -181,8 +181,7 @@ function animateForm() {
   )
   tl.fromTo(cardRef.value.querySelector('.btn-login'),
     { opacity: 0, y: 10 },
-    { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
-    '-=0.15'
+    { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
   )
   tl.call(() => usernameInput.value?.focus())
 }
@@ -230,8 +229,7 @@ onMounted(() => {
   )
   tl.fromTo(cardRef.value.querySelector('.btn-login'),
     { opacity: 0, y: 10 },
-    { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
-    '-=0.15'
+    { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
   )
 })
 </script>
